@@ -1,0 +1,16 @@
+{
+  "name": "mejor-precio-server",
+  "version": "1.0.0",
+  "description": "Backend que consulta la API pública de MercadoLibre para el comparador de precios",
+  "main": "index.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node index.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "cors": "^2.8.5",
+    "node-fetch": "^2.7.0"
+  }
+}

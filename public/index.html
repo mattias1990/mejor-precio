@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MEJOR PRECIO — Comparador de precios Argentina</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <div class="logo"><span class="tag-icon"></span>MEJOR PRECIO</div>
+    <div class="nav-links">
+      <a href="#como-funciona">Cómo funciona</a>
+      <a href="#tiendas">Tiendas</a>
+    </div>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="container">
+    <div class="eyebrow mono">Comparador de precios · Argentina</div>
+    <h1>Un producto,<br><span>todos los precios.</span></h1>
+    <p>Buscá en Ropa y Electrodomésticos y te mostramos el mismo producto en todas las tiendas, ordenado como quieras.</p>
+
+    <div class="search-box">
+      <input type="text" id="searchInput" placeholder="Buscá una zapatilla, un lavarropas, una campera..." value="zapatillas running">
+      <button id="searchBtn">Buscar</button>
+    </div>
+
+    <div class="chip-row">
+      <div class="chip active" data-cat="todas">Todas</div>
+      <div class="chip" data-cat="ropa">Ropa</div>
+      <div class="chip" data-cat="electro">Electrodomésticos</div>
+    </div>
+  </div>
+</section>
+
+<section class="results-section">
+  <div class="container">
+    <div class="results-bar">
+      <div class="results-count"><b id="resultCount">0</b> resultados para "<span id="queryLabel"></span>"</div>
+      <div class="sort-control">
+        Ordenar por precio:
+        <div class="sort-buttons">
+          <button class="sort-btn" id="sortAsc">Menor a mayor ↑</button>
+          <button class="sort-btn" id="sortDesc">Mayor a menor ↓</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="product-list" id="productList"></div>
+  </div>
+</section>
+
+<section class="section" id="como-funciona">
+  <div class="container">
+    <div class="section-head">
+      <div class="section-eyebrow mono">Cómo funciona</div>
+      <h2>Rastreamos precios todos los días.</h2>
+      <p>Buscamos el mismo producto en varias tiendas, comparamos precio final (con envío incluido cuando aplica) y te mostramos primero la mejor opción.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="tiendas">
+  <div class="container">
+    <div class="section-head">
+      <div class="section-eyebrow mono">Tiendas que comparamos</div>
+      <h2>Cada vez sumamos más.</h2>
+    </div>
+    <div class="stores-grid">
+      <div class="store-pill">MercadoLibre</div>
+    </div>
+    <p style="margin-top:16px; color:var(--ink-soft); font-size:14px;">Por ahora comparamos contra MercadoLibre, la única tienda con API pública real en Argentina. Sumamos más a medida que consigamos acceso.</p>
+  </div>
+</section>
+
+<footer>
+  <div class="container footer-inner">
+    <div>© 2026 MEJOR PRECIO — Datos de ejemplo, no reales.</div>
+    <div>Los precios pueden variar respecto a la tienda original.</div>
+  </div>
+</footer>
+
+<script src="script.js"></script>
+
+</body>
+</html>
