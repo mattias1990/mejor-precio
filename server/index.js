@@ -41,18 +41,14 @@ function setCached(key, data) {
   cache.set(key, { data, timestamp: Date.now() });
 }
 
-// ---------- Categorías soportadas (mapeadas a categorías reales de MercadoLibre Argentina) ----------
-// MLA1430 = Ropa y Accesorios / MLA5726 = Electrodomésticos
-const CATEGORY_MAP = {
-  ropa: 'MLA1430',
-  electro: 'MLA5726',
-};
-
 // ---------- Proveedor: MercadoLibre ----------
+// Nota: no filtramos por category_id de MercadoLibre porque muchos productos
+// no caen donde uno esperaría (ej: zapatillas deportivas quedan en "Deportes",
+// no en "Ropa y Accesorios"), y eso generaba falsos 0 resultados.
+// Dejamos que el buscador de texto de MercadoLibre haga el trabajo, que es
+// más preciso que nuestro propio mapeo de categorías.
 async function searchMercadoLibre(query, categoryKey, limit = 30) {
   const params = new URLSearchParams({ q: query, limit: String(limit) });
-  const categoryId = CATEGORY_MAP[categoryKey];
-  if (categoryId) params.set('category', categoryId);
 
   const url = `https://api.mercadolibre.com/sites/MLA/search?${params.toString()}`;
   const response = await fetch(url);
