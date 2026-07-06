@@ -2,11 +2,6 @@
 // MEJOR PRECIO — Backend
 // Consulta la API pública de MercadoLibre y devuelve resultados
 // normalizados y ordenables por precio.
-//
-// Arquitectura pensada para sumar más "proveedores" (tiendas)
-// en el futuro sin tocar el resto del código: cada proveedor
-// es una función que recibe una búsqueda y devuelve un array
-// de productos con la misma forma (ver normalizeMLItem).
 // ============================================================
 
 const express = require('express');
@@ -18,13 +13,9 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(cors());
-
-// Sirve el frontend estático (carpeta ../public) desde este mismo servidor.
-// Así el deploy es un solo servicio, sin CORS ni URLs separadas.
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
-// ---------- Cache simple en memoria (evita pegarle a la API de ML en cada búsqueda repetida) ----------
-const CACHE_TTL_MS = 10 * 60 * 1000; // 10 minutos
+const CACHE_TTL_MS = 10 * 60 * 1000;
 const cache = new Map();
 
 function getCached(key) {
@@ -41,17 +32,16 @@ function setCached(key, data) {
   cache.set(key, { data, timestamp: Date.now() });
 }
 
-// ---------- Proveedor: MercadoLibre ----------
-// Nota: no filtramos por category_id de MercadoLibre porque muchos productos
-// no caen donde uno esperaría (ej: zapatillas deportivas quedan en "Deportes",
-// no en "Ropa y Accesorios"), y eso generaba falsos 0 resultados.
-// Dejamos que el buscador de texto de MercadoLibre haga el trabajo, que es
-// más preciso que nuestro propio mapeo de categorías.
 async function searchMercadoLibre(query, categoryKey, limit = 30) {
   const params = new URLSearchParams({ q: query, limit: String(limit) });
-
   const url = `https://api.mercadolibre.com/sites/MLA/search?${params.toString()}`;
-  const response = await fetch(url);
+  const response = await fetch(url, {
+    headers: {
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+      'Accept': 'application/json',
+      'Accept-Language': 'es-AR,es;q=0.9',
+    },
+  });
 
   if (!response.ok) {
     throw new Error(`MercadoLibre API respondió ${response.status}`);
@@ -71,23 +61,18 @@ function normalizeMLItem(item) {
     link: item.permalink,
     thumbnail: (item.thumbnail || '').replace('http://', 'https://'),
     freeShipping: !!(item.shipping && item.shipping.free_shipping),
-    condition: item.condition, // 'new' | 'used'
+    condition: item.condition,
   };
 }
 
-// ---------- Lista de proveedores activos ----------
-// Para sumar uno nuevo el día de mañana: escribir su función
-// (misma forma de retorno que normalizeMLItem) y agregarla acá.
 const PROVIDERS = [
   { name: 'mercadolibre', search: searchMercadoLibre },
-  // { name: 'amazon', search: searchAmazon },   // requiere aprobación de afiliado (PA-API)
 ];
 
-// ---------- Endpoint principal ----------
 app.get('/api/search', async (req, res) => {
   const query = (req.query.q || '').trim();
   const category = (req.query.category || 'todas').trim();
-  const sort = (req.query.sort || '').trim(); // 'asc' | 'desc' | ''
+  const sort = (req.query.sort || '').trim();
 
   if (!query) {
     return res.status(400).json({ error: 'Falta el parámetro de búsqueda "q".' });
@@ -102,7 +87,7 @@ app.get('/api/search', async (req, res) => {
         PROVIDERS.map(p =>
           p.search(query, category === 'todas' ? null : category).catch(err => {
             console.error(`Error consultando ${p.name}:`, err.message);
-            return []; // si un proveedor falla, seguimos con los demás
+            return [];
           })
         )
       );
@@ -117,12 +102,7 @@ app.get('/api/search', async (req, res) => {
   if (sort === 'asc') sorted.sort((a, b) => a.price - b.price);
   if (sort === 'desc') sorted.sort((a, b) => b.price - a.price);
 
-  res.json({
-    query,
-    category,
-    count: sorted.length,
-    results: sorted,
-  });
+  res.json({ query, category, count: sorted.length, results: sorted });
 });
 
 app.get('/api/health', (req, res) => res.json({ ok: true }));
